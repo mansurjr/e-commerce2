@@ -3,7 +3,6 @@ import { useRoutes } from "react-router-dom";
 import Blog from "./blog";
 import GlobalLoading from "../components/GlobalLoading";
 
-
 const MainLayout = lazy(() => import("./layout"));
 
 const Home = lazy(() => import("./home"));
@@ -38,7 +37,7 @@ const AppRouter = () => {
             { path: "blog", element: <Blog /> },
           ],
         },
-        
+
         // private route
         {
           path: "/",
@@ -47,11 +46,21 @@ const AppRouter = () => {
             {
               path: "",
               element: <MainLayout />,
-              children: [{ path: "account", element: <Account /> }],
+              children: [
+                {
+                  path: "account",
+                  element: <Account />,
+                  children: [
+                    { index: true, element: <Account /> },
+                    { path: "cart", element: <Cart /> },
+                    { path: "liked", element: <Liked /> },
+                  ],
+                },
+              ],
             },
           ],
         },
-        
+
         // public route without layout
         { path: "/sign-in", element: <SignIn /> },
         { path: "*", element: <NotFound /> },

@@ -2,7 +2,7 @@ import { memo, useEffect, useState } from "react";
 import { api } from "../../api";
 import { useDispatch } from "react-redux";
 import { removeToken } from "../../lib/features/authSlice";
-import { NavLink } from "react-router-dom";
+import Cart from "../cart";
 
 const Account = () => {
   const [user, setUser] = useState<any>(null);
@@ -10,6 +10,17 @@ const Account = () => {
   const [error, setError] = useState<string | null>(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const dispatch = useDispatch();
+  // hello world
+
+  const [activeTab, setActiveTab] = useState<"account" | "cart" | "wishlist">(
+    "account"
+  );
+
+  const tabs = [
+    { name: "Account", key: "account" },
+    { name: "Carts", key: "cart" },
+    { name: "Wishlist", key: "wishlist" },
+  ];
 
   const handleLogOut = () => {
     dispatch(removeToken());
@@ -39,18 +50,16 @@ const Account = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="text-center py-8">
-          <div className="h-10 w-40 bg-gray-300 rounded-lg mx-auto"></div>
-        </div>
-
         <div className="max-w-7xl mx-auto pb-8 px-4">
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="w-full lg:w-[262px] lg:h-[498px]">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
+            <div className="w-full lg:w-[262px] lg:h-[490px] self-start">
               <div className="bg-[#F3F5F7] rounded-lg h-full p-6 flex flex-col items-center">
                 <div className="w-[82px] h-[82px] bg-gray-300 rounded-full mb-6"></div>
-                <div className="h-6 w-32 bg-gray-300 rounded mb-6"></div>
+
+                <div className="h-6 w-40 bg-gray-300 rounded mb-10"></div>
+
                 <div className="space-y-4 w-full">
-                  {Array(5)
+                  {Array(4)
                     .fill(0)
                     .map((_, i) => (
                       <div
@@ -65,23 +74,19 @@ const Account = () => {
             <div className="flex-1 lg:mr-[79px]">
               <div className="space-y-8">
                 <div>
-                  <div className="h-6 w-40 bg-gray-300 rounded mb-6"></div>
-                  <div className="border border-gray-300 rounded-lg p-4 space-y-4">
-                    {Array(4)
-                      .fill(0)
-                      .map((_, i) => (
-                        <div key={i} className="h-10 bg-gray-200 rounded"></div>
-                      ))}
-                  </div>
-                </div>
+                  <div className="border border-gray-300 rounded-lg p-4 space-y-4 text-left">
+                    {/* title */}
+                    <div className="text-center py-8">
+                      <div className="h-8 w-48 bg-gray-300 rounded-lg mx-auto"></div>
+                    </div>
 
-                <div>
-                  <div className="h-6 w-56 bg-gray-300 rounded mb-6"></div>
-                  <div className="border border-gray-300 rounded-lg p-4 space-y-4">
-                    {Array(3)
+                    {Array(7)
                       .fill(0)
                       .map((_, i) => (
-                        <div key={i} className="h-10 bg-gray-200 rounded"></div>
+                        <div key={i} className="py-[7px] px-[16px]">
+                          <div className="h-4 w-32 bg-gray-300 rounded mb-2"></div>
+                          <div className="h-6 w-64 bg-gray-200 rounded"></div>
+                        </div>
                       ))}
                   </div>
                 </div>
@@ -95,15 +100,9 @@ const Account = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="text-center py-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-          My Account
-        </h1>
-      </div>
-
       <div className="max-w-7xl mx-auto pb-8 px-4">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="w-full lg:w-[262px] lg:h-[490px]">
+        <div className="flex flex-col lg:flex-row gap-8 items-start  ">
+          <div className="w-full lg:w-[262px] lg:h-[490px] self-start ">
             <div className="bg-muted rounded-lg h-full bg-[#F3F5F7]">
               <div className="text-center">
                 <div className="relative inline-block mt-[40px]">
@@ -129,7 +128,7 @@ const Account = () => {
                     onClick={toggleNav}
                     className="flex items-center justify-between w-full text-left mt-[12px] font-semibold text-[16px] leading-[26px] py-[8px] text-[#141718] border-b border-[#141718]"
                   >
-                    Account
+                    See more
                     <svg
                       className={`w-4 h-4 transition-transform ${
                         isNavOpen ? "rotate-180" : ""
@@ -151,22 +150,25 @@ const Account = () => {
                   {isNavOpen && (
                     <div className="pl-4 border-l-2 border-gray-200 ml-2">
                       {[
-                        { name: "Carts", path: "/cart" },
-                        { name: "Wishlist", path: "/liked" },
+                        { name: "Account", key: "account" },
+                        { name: "Carts", key: "cart" },
+                        { name: "Wishlist", key: "wishlist" },
                       ].map((tab) => (
-                        <NavLink
-                          key={tab.name}
-                          to={tab.path}
-                          className={({ isActive }) =>
-                            `block w-full text-left mt-[12px] font-semibold text-[16px] leading-[26px] py-[8px] transition-colors ${
-                              isActive
-                                ? "text-[#141718] border-b border-[#141718]"
-                                : "text-[#6C7275]"
-                            }`
-                          }
+                        <button
+                          key={tab.key}
+                          onClick={() => {
+                            setActiveTab(
+                              tab.key as "cart" | "wishlist" | "account"
+                            );
+                          }}
+                          className={`block w-full text-left mt-[12px] font-semibold text-[16px] leading-[26px] py-[8px] transition-colors ${
+                            activeTab === tab.key
+                              ? "text-[#141718] border-b border-[#141718]"
+                              : "text-[#6C7275] hover:text-[#141718]"
+                          }`}
                         >
                           {tab.name}
-                        </NavLink>
+                        </button>
                       ))}
 
                       <button
@@ -181,24 +183,18 @@ const Account = () => {
 
                 {/* Desktop section start*/}
                 <div className="hidden lg:block">
-                  {[
-                    { name: "Account", path: "/account" },
-                    { name: "Carts", path: "/cart" },
-                    { name: "Wishlist", path: "/liked" },
-                  ].map((tab) => (
-                    <NavLink
-                      key={tab.name}
-                      to={tab.path}
-                      className={({ isActive }) =>
-                        `block w-full text-left mt-[12px] font-semibold text-[16px] leading-[26px] py-[8px] border-b border-[#E8ECEF] transition-colors ${
-                          isActive
-                            ? "text-[#141718] border-b-2 border-[#141718]"
-                            : "text-[#6C7275] hover:text-[#141718] hover:border-b-2 hover:border-[#141718]"
-                        }`
-                      }
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveTab(tab.key as any)}
+                      className={`block w-full text-left mt-[12px] font-semibold text-[16px] leading-[26px] py-[8px] border-b border-[#E8ECEF] transition-colors ${
+                        activeTab === tab.key
+                          ? "text-[#141718] border-b-2 border-[#141718]"
+                          : "text-[#6C7275] hover:text-[#141718] hover:border-b-2 hover:border-[#141718]"
+                      }`}
                     >
                       {tab.name}
-                    </NavLink>
+                    </button>
                   ))}
 
                   <button
@@ -214,81 +210,89 @@ const Account = () => {
 
           {/* main content */}
           <div className="flex-1 lg:mr-[79px]">
-            <div className="space-y-8">
+            {activeTab == "account" && (
               <div>
-                <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">
-                  Account Details
-                </h2>
-                <div className="border border-gray-300 rounded-lg p-4 space-y-4 text-left">
-                  <div className="py-[7px] px-[16px]">
-                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                      First Name *
-                    </p>
-                    <p className="text-foreground break-words">
-                      {user.firstName}
-                    </p>
-                  </div>
+                <div className="space-y-8">
+                  <div>
+                    <div className="border border-gray-300 rounded-lg p-4 space-y-4 text-left">
+                      <div className="text-center py-8">
+                        <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                          My Account
+                        </h1>
+                      </div>
+                      <div className="py-[7px] px-[16px]">
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                          First Name *
+                        </p>
+                        <p className="text-foreground break-words">
+                          {user.firstName}
+                        </p>
+                      </div>
 
-                  <div className="py-[7px] px-[16px]">
-                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                      Last Name *
-                    </p>
-                    <p className="text-foreground break-words">
-                      {user.lastName}
-                    </p>
-                  </div>
+                      <div className="py-[7px] px-[16px]">
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                          Last Name *
+                        </p>
+                        <p className="text-foreground break-words">
+                          {user.lastName}
+                        </p>
+                      </div>
 
-                  <div className="py-[7px] px-[16px]">
-                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                      Username *
-                    </p>
-                    <p className="text-foreground break-words">
-                      {user.username}
-                    </p>
-                  </div>
+                      <div className="py-[7px] px-[16px]">
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                          Username *
+                        </p>
+                        <p className="text-foreground break-words">
+                          {user.username}
+                        </p>
+                      </div>
 
-                  <div className="py-[7px] px-[16px]">
-                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                      Email *
-                    </p>
-                    <p className="text-foreground break-words">{user.email}</p>
+                      <div className="py-[7px] px-[16px]">
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                          Email *
+                        </p>
+                        <p className="text-foreground break-words">
+                          {user.email}
+                        </p>
+                      </div>
+
+                      <div className="py-[7px] px-[16px]">
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                          Password
+                        </p>
+                        <p className="text-foreground break-words">
+                          {user.password}
+                        </p>
+                      </div>
+
+                      <div className="py-[7px] px-[16px]">
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                          Phone number
+                        </p>
+                        <p className="text-foreground break-words">
+                          {user.phone}
+                        </p>
+                      </div>
+
+                      <div className="py-[7px] px-[16px]">
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                          Birthdate
+                        </p>
+                        <p className="text-foreground break-words">
+                          {user.birthDate}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* other informations  */}
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">
-                  Other informations
-                </h2>
-                <div className="border border-gray-300 rounded-lg p-4 space-y-4 text-left">
-                  <div className="py-[7px] px-[16px]">
-                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                      Password
-                    </p>
-                    <p className="text-foreground break-words">
-                      {user.password}
-                    </p>
-                  </div>
-
-                  <div className="py-[7px] px-[16px]">
-                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                      Phone number
-                    </p>
-                    <p className="text-foreground break-words">{user.phone}</p>
-                  </div>
-
-                  <div className="py-[7px] px-[16px]">
-                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                      Birthdate
-                    </p>
-                    <p className="text-foreground break-words">
-                      {user.birthDate}
-                    </p>
-                  </div>
-                </div>
+            {activeTab == "cart" && (
+              <div className="space-y-8 bg-white border border-gray-300 rounded-lg p-6">
+                <Cart className="lg:!p-0 !p-0" />
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
