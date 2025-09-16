@@ -2,7 +2,7 @@ import { memo } from "react";
 import adressIMG from "../../../assets/contactUs/address.png";
 import callIMG from "../../../assets/contactUs/call.png";
 import mailIMG from "../../../assets/contactUs/mail.png";
-import mapIMG from "../../../assets/contactUs/map.png";
+import mapIMG from "../../../assets/contactUs/Map.png";
 
 const ContactUsIn = () => {
   return (
