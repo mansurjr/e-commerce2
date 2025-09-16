@@ -6,7 +6,7 @@ import {
   FaRegHeart,
 } from "react-icons/fa";
 import { useFetch } from "../../../hooks/useFetch";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCart,
@@ -14,9 +14,13 @@ import {
   increaseAmount,
   type ICartProduct,
 } from "../../../lib/features/cartSlice";
-import { toggleLiked, type ILikeProduct } from "../../../lib/features/likeSlice";
+import {
+  toggleLiked,
+  type ILikeProduct,
+} from "../../../lib/features/likeSlice";
 import type { RootState } from "../../../lib";
 import Loading from "./Loading";
+import avatar from "../../../assets/avatar_placeholder.svg";
 
 export default function ProductPage() {
   const dispatch = useDispatch();
@@ -24,7 +28,9 @@ export default function ProductPage() {
   const wishlist = useSelector((state: RootState) => state.liked.value);
 
   const { id } = useParams();
-  const { data, loading, error } = useFetch<{ products: ILikeProduct[] }>("/products");
+  const { data, loading, error } = useFetch<{ products: ILikeProduct[] }>(
+    "/products"
+  );
   const [color, setColor] = useState("black");
   const data1 = [
     { id: "black", color: "bg-black" },
@@ -148,7 +154,8 @@ export default function ProductPage() {
                 onClick={() => setColor(c.id)}
                 className={`w-10 h-10 rounded-full border flex items-center justify-center hover:cursor-pointer ${
                   color === c.id ? "ring-2 ring-black" : ""
-                }`}>
+                }`}
+              >
                 <span className={`w-6 h-6 rounded-full ${c.color}`}></span>
               </button>
             ))}
@@ -161,7 +168,8 @@ export default function ProductPage() {
             <button
               disabled={quantity <= 1}
               onClick={() => cartItem && dispatch(decreaseAmount(cartItem))}
-              className="px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
+              className="px-3 py-1 disabled:opacity-30 hover:bg-gray-100"
+            >
               -
             </button>
 
@@ -175,13 +183,15 @@ export default function ProductPage() {
                   quantity += 1;
                 }
               }}
-              className="px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
+              className="px-3 py-1 disabled:opacity-30 hover:bg-gray-100"
+            >
               +
             </button>
           </div>
           <button
             onClick={() => dispatch(toggleLiked(product))}
-            className="flex items-center gap-2 border px-4 py-2 rounded-lg hover:cursor-pointer">
+            className="flex items-center gap-2 border px-4 py-2 rounded-lg hover:cursor-pointer"
+          >
             {wishlist.some((pro) => pro.id === product.id) ? (
               <FaHeart className="text-red-500" />
             ) : (
@@ -193,13 +203,90 @@ export default function ProductPage() {
 
         <button
           onClick={() => dispatch(addToCart(product))}
-          className="w-full bg-black text-white py-3 rounded-lg font-medium mt-4 hover:cursor-pointer">
+          className="w-full bg-black text-white py-3 rounded-lg font-medium mt-4 hover:cursor-pointer"
+        >
           Add to Cart
         </button>
 
         <div className="text-sm text-gray-500 mt-3">
           <p>SKU: 1117</p>
           <p>Category: Living Room, Bedroom</p>
+        </div>
+      </div>
+
+      {/* reviews */}
+      <div className="w-full">
+        <div>
+          <ul className="flex gap-10">
+            <li className="border-b-2">
+              <Link to={""}>Additional Info</Link>
+            </li>
+            <li>
+              <Link to={"questions"}>Questions</Link>
+            </li>
+            <li>
+              <Link to={"reviews"}>Customer Reviews</Link>
+            </li>
+          </ul>
+          <hr className="text-gray-300" />
+        </div>
+        <div>
+          <h2 className="my-5 font-bold text-2xl">Customer Reviews</h2>
+          <div className="flex gap-3">
+            <p>3 Reviews</p>
+          </div>
+        </div>
+        <p className="ml-20 my-2">Tray table</p>
+        <div className="relative">
+          <input
+            type="text"
+            className="border border-gray-300 rounded-md py-2 pr-[15%] w-[100%]"
+          />
+          <button className="bg-black rounded-full text-white px-8 absolute right-5 top-1.5 py-1 ">
+            write Review
+          </button>
+        </div>
+        <div>
+          <div className="flex items-center justify-between my-3">
+            <strong>11 Reviews</strong>
+            <select
+              id="sort"
+              className="border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+            >
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="popular">Most Popular</option>
+            </select>
+          </div>
+          {/* Coment */}
+          <div>
+            <div className="">
+              {product?.reviews?.map((review, index) => (
+                <div key={index}>
+                  <div className="flex gap-5">
+                    <div>
+                      <img src={avatar} alt="" />
+                    </div>
+                    <div>
+                      <h3>{review.reviewerName}</h3>
+                      <p>{review.rating}</p>
+                      <p>{review.comment}</p>
+                      <div className="flex ml-10 gap-5">
+                        <button>Like</button>
+                        <button>Reply</button>
+                      </div>
+                    </div>
+                  </div>
+                  <hr className="my-2" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="my-3">
+          <button className="border-2 rounded-full px-5 flex mx-auto">
+            Load More
+          </button>
         </div>
       </div>
     </div>
