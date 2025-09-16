@@ -9,7 +9,11 @@ import {
   type ICartProduct,
 } from "../../lib/features/cartSlice";
 
-const Cart = () => {
+type CartsProps = {
+  className?: string;
+};
+
+const Cart = ({ className }: CartsProps) => {
   const carts = useSelector((state: RootState) => state.cart.value);
   const dispatch = useDispatch();
 
@@ -21,7 +25,7 @@ const Cart = () => {
   }, [carts]);
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className={`container mx-auto px-4 sm:px-6 lg:px-8 py-6 ${className}`}>
       <h3 className="text-2xl sm:text-3xl lg:text-[40px] font-medium text-center my-6 sm:my-12">
         Cart
       </h3>
@@ -56,7 +60,8 @@ const Cart = () => {
                         </p>
                         <button
                           className="mt-1 text-xs sm:text-sm text-[#6C7275] hover:underline"
-                          onClick={() => dispatch(removeFromCart(item))}>
+                          onClick={() => dispatch(removeFromCart(item))}
+                        >
                           ✖ Remove
                         </button>
                       </div>
@@ -67,14 +72,16 @@ const Cart = () => {
                         <button
                           disabled={item.quantity <= 1}
                           onClick={() => dispatch(decreaseAmount(item))}
-                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
+                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100"
+                        >
                           -
                         </button>
                         <span className="px-3 sm:px-4">{item.quantity}</span>
                         <button
                           disabled={item.quantity >= item.stock!}
                           onClick={() => dispatch(increaseAmount(item))}
-                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
+                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100"
+                        >
                           +
                         </button>
                       </div>
@@ -113,7 +120,8 @@ const Cart = () => {
 
             <button
               onClick={() => dispatch(clearCart())}
-              className="mt-6 w-full bg-black hover:bg-gray-800 text-white py-2 sm:py-3 rounded-lg transition">
+              className="mt-6 w-full bg-black hover:bg-gray-800 text-white py-2 sm:py-3 rounded-lg transition"
+            >
               Checkout
             </button>
           </div>
