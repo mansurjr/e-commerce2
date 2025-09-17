@@ -12,12 +12,32 @@ import headerLogo from "../../../assets/header_svgs/3legant..svg";
 import coupon from "../../../assets/header_svgs/ticket-percent.svg";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../lib";
+import { api } from "../../../api";
+
+type SearchResult =
+  | {
+      id: number;
+      title: string;
+      category: string;
+      thumbnail: string;
+      type: "product";
+    }
+  | {
+      id: string;
+      title: string;
+      type: "category";
+    };
 
 const Header = () => {
   const carts = useSelector((state: RootState) => state.cart.value);
   const navigate = useNavigate();
+
   const [isVisible, setIsVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -28,12 +48,62 @@ const Header = () => {
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await api.get("/products/search", {
+          params: { q: query },
+        });
+
+        const products: SearchResult[] = (res.data.products || []).map(
+          (p: any) => ({
+            id: p.id,
+            title: p.title,
+            category: p.category,
+            thumbnail: p.thumbnail,
+            type: "product",
+          })
+        );
+
+        const categories: SearchResult[] = Array.from(
+          new Set((res.data.products || []).map((p: any) => p.category as string))
+        ).map((cat) => ({
+          id: cat,
+          title: cat,
+          type: "category",
+        }));
+
+        setResults([...categories, ...products]);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
+
+  const handleResultClick = (item: SearchResult) => {
+    setIsSearchOpen(false);
+    setQuery("");
+    setResults([]);
+
+    if (item.type === "category") {
+      navigate(`/category/${item.id}`);
+    } else if (item.type === "product") {
+      navigate(`/product/${item.id}`);
+    }
+  };
 
   return (
     <>
@@ -95,14 +165,18 @@ const Header = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <button className="hidden md:flex h-9 w-9 items-center justify-center rounded-md hover:bg-gray-100 transition-colors duration-200 cursor-pointer">
+              <button
+                className="hidden md:flex h-9 w-9 items-center justify-center rounded-md hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+                onClick={() => setIsSearchOpen(!isSearchOpen)}>
                 <Search className="h-5 w-5" />
               </button>
+
               <button
                 className="hidden sm:flex h-9 w-9 items-center justify-center rounded-md hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
                 onClick={() => navigate("/account")}>
                 <CircleUser className="h-5 w-5" />
               </button>
+
               <button
                 onClick={() => {
                   navigate("/cart");
@@ -116,6 +190,53 @@ const Header = () => {
             </div>
           </div>
         </div>
+
+        {isSearchOpen && (
+          <div className="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-md z-40">
+            <div className="container py-4">
+              <input
+                type="text"
+                placeholder="Search products or categories..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              />
+
+              {loading && (
+                <p className="mt-2 text-sm text-gray-500">Searching...</p>
+              )}
+
+              {!loading && results.length > 0 && (
+                <ul className="mt-2 space-y-2">
+                  {results.map((item) => (
+                    <li
+                      key={item.id}
+                      onClick={() => handleResultClick(item)}
+                      className="cursor-pointer px-3 py-2 hover:bg-gray-100 rounded-md flex items-center gap-3">
+                      {"thumbnail" in item && item.thumbnail && (
+                        <img
+                          src={item.thumbnail}
+                          alt={item.title}
+                          className="w-8 h-8 object-cover rounded"
+                        />
+                      )}
+                      <span className="font-medium text-gray-800">
+                        {item.title}
+                      </span>
+                      <span className="ml-2 text-xs text-gray-500">
+                        ({item.type})
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {!loading && query && results.length === 0 && (
+                <p className="mt-2 text-sm text-gray-500">No results found.</p>
+              )}
+            </div>
+          </div>
+        )}
 
         {isMobileMenuOpen && (
           <div className="fixed inset-0 bg-black/50 z-50 md:hidden">
