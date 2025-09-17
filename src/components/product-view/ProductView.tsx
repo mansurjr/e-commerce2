@@ -57,7 +57,6 @@ const ProductView: FC<IProps> = ({
                     className="w-full h-full object-contain"
                   />
 
-                  {/* ✅ Add to cart dispatch */}
                   <button
                     onClick={() => dispatch(addToCart(item))}
                     className="absolute bottom-4 left-1/2 -translate-x-1/2
@@ -70,7 +69,6 @@ const ProductView: FC<IProps> = ({
                     Add to cart
                   </button>
 
-                  {/* NEW / Discount badges */}
                   <div className="absolute top-4 left-4 flex flex-col items-center gap-2">
                     <span className="bg-white font-semibold px-5 py-1">
                       NEW
@@ -82,7 +80,6 @@ const ProductView: FC<IProps> = ({
                     )}
                   </div>
 
-                  {/* ✅ Toggle liked dispatch */}
                   <button
                     onClick={() => dispatch(toggleLiked(item))}
                     className="absolute top-2 right-2 bg-white p-2 rounded-full shadow text-gray-600 
