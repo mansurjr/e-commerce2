@@ -13,9 +13,16 @@ interface IProps {
   loading: boolean;
   error: string | null;
   skeleton?: ReactNode;
+  gridType?: "2" | "3" | "4";
 }
 
-const ProductView: FC<IProps> = ({ data, loading, error, skeleton }) => {
+const ProductView: FC<IProps> = ({
+  data,
+  loading,
+  error,
+  skeleton,
+  gridType = "4",
+}) => {
   const dispatch = useDispatch();
 
   return (
@@ -35,7 +42,12 @@ const ProductView: FC<IProps> = ({ data, loading, error, skeleton }) => {
         {error && <p className="text-red-500">{error}</p>}
 
         {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            className={`grid gap-6 grid-cols-1 sm:grid-cols-2 
+            ${gridType === "2" ? "lg:grid-cols-2" : ""} 
+            ${gridType === "3" ? "lg:grid-cols-3" : ""} 
+            ${gridType === "4" ? "lg:grid-cols-4" : ""}`}
+          >
             {data.map((item) => (
               <div key={item.id} className="flex flex-col gap-2">
                 <div className="relative w-full bg-[#F3F5F7] group overflow-hidden py-15">
@@ -53,7 +65,8 @@ const ProductView: FC<IProps> = ({ data, loading, error, skeleton }) => {
                       bg-[#141718] text-white rounded-xl
                       opacity-100 sm:opacity-0 group-hover:opacity-100 
                       translate-y-0 sm:translate-y-4 group-hover:translate-y-0
-                      transition-all duration-300 hover:cursor-pointer">
+                      transition-all duration-300 hover:cursor-pointer"
+                  >
                     Add to cart
                   </button>
 
@@ -74,7 +87,8 @@ const ProductView: FC<IProps> = ({ data, loading, error, skeleton }) => {
                     onClick={() => dispatch(toggleLiked(item))}
                     className="absolute top-2 right-2 bg-white p-2 rounded-full shadow text-gray-600 
                       opacity-100 sm:opacity-0 group-hover:opacity-100 
-                      transition-opacity duration-300">
+                      transition-opacity duration-300"
+                  >
                     <FaRegHeart size={14} />
                   </button>
                 </div>

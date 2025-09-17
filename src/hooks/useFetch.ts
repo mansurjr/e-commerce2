@@ -6,6 +6,8 @@ interface IParams {
   limit?: number;
   page?: number;
   skip?: number;
+  sortBy?: string;
+  order?: string;
 }
 
 interface FetchState<T> {
@@ -47,7 +49,6 @@ export const useFetch = <T = unknown>(
     if (immediate) {
       fetchData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endpoint, JSON.stringify(params)]);
 
   return { ...state, refetch: fetchData };
