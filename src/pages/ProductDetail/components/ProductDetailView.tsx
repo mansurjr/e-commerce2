@@ -43,6 +43,7 @@ export default function ProductPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        window.scrollTo(0, 0);
         setLoading(true);
         const res = await api.get<ILikeProduct>(`/products/${id}`);
         setProduct(res.data);
