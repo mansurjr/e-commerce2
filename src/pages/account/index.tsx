@@ -10,8 +10,7 @@ const Account = () => {
   const [error, setError] = useState<string | null>(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const dispatch = useDispatch();
-  // hello world
-
+  
   const [activeTab, setActiveTab] = useState<"account" | "cart" | "wishlist">(
     "account"
   );
