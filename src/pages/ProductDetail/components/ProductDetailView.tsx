@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaChevronLeft,
   FaChevronRight,
   FaHeart,
   FaRegHeart,
 } from "react-icons/fa";
-import { useFetch } from "../../../hooks/useFetch";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,8 +13,12 @@ import {
   increaseAmount,
   type ICartProduct,
 } from "../../../lib/features/cartSlice";
-import { toggleLiked, type ILikeProduct } from "../../../lib/features/likeSlice";
+import {
+  toggleLiked,
+  type ILikeProduct,
+} from "../../../lib/features/likeSlice";
 import type { RootState } from "../../../lib";
+import { api } from "../../../api";
 import Loading from "./Loading";
 
 export default function ProductPage() {
@@ -23,28 +26,40 @@ export default function ProductPage() {
   const carts = useSelector((state: RootState) => state.cart.value);
   const wishlist = useSelector((state: RootState) => state.liked.value);
 
-  const { id } = useParams();
-  const { data, loading, error } = useFetch<{ products: ILikeProduct[] }>("/products");
+  const { id } = useParams<{ id: string }>();
+
+  const [product, setProduct] = useState<ILikeProduct | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [color, setColor] = useState("black");
-  const data1 = [
+  const colorOptions = [
     { id: "black", color: "bg-black" },
     { id: "beige", color: "bg-gray-300" },
     { id: "red", color: "bg-red-500" },
     { id: "yellow", color: "bg-yellow-500 border" },
   ];
 
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get<ILikeProduct>(`/products/${id}`);
+        setProduct(res.data);
+      } catch (err) {
+        setError("Product not found");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchProduct();
+  }, [id]);
+
   if (loading) return <Loading />;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (!product) return null;
 
-  if (error)
-    return <p className="text-center text-red-500">Error loading product</p>;
-  if (!data) return null;
-
-  const product = data.products.find((p: ILikeProduct) => String(p.id) === id);
-
-  if (!product) {
-    return <p className="text-center text-red-500">Product not found</p>;
-  }
-  console.log("carts>>>", carts);
   const cartItem = carts.find((c: ICartProduct) => c.id === product.id);
   let quantity = cartItem?.quantity ?? 0;
 
@@ -60,16 +75,17 @@ export default function ProductPage() {
               Shop {"> "}
             </p>
             <p className="text-sm text-gray-500 mb-2 hover:cursor-pointer">
-              Living Room {"> "}
+              {product.category} {"> "}
             </p>
             <p className="text-sm text-gray-500 mb-2 hover:cursor-pointer">
-              Product
+              {product.title}
             </p>
           </div>
+
           <div className="flex justify-center">
             <img
               src={product.thumbnail}
-              alt="Tray Table"
+              alt={product.title}
               className="w-full max-w-lg h-auto object-contain rounded-lg shadow-md transition-shadow duration-300 hover:shadow-2xl hover:cursor-pointer"
             />
           </div>
@@ -81,11 +97,13 @@ export default function ProductPage() {
             <FaChevronRight />
           </button>
         </div>
-        <div className="flex gap-3.5 mt-4 w-[167px] ">
-          {product.images?.map((item: string, inx: number) => (
+
+        <div className="flex gap-3.5 mt-4 w-[167px]">
+          {product.images?.map((item, inx) => (
             <img
               key={inx}
               src={item}
+              alt={product.title}
               className="rounded-lg transition-shadow duration-300 hover:shadow-2xl hover:cursor-pointer"
             />
           ))}
@@ -95,54 +113,25 @@ export default function ProductPage() {
       <div className="space-y-4">
         <h2 className="text-3xl font-semibold">{product.title}</h2>
         <p className="text-gray-600">{product.description}</p>
-        <span className=" text-red-400 text-[10px] mb-2">
+        <span className="text-red-400 text-[10px] mb-2">
           {product.discountPercentage}% discount
         </span>
+
         <div className="flex items-center gap-3">
-          <span className="line-through text-gray-400">${product.price} </span>
-
-          <div className="flex">
-            <span className="text-2xl font-bold text-gray-900">
-              $
-              {(
-                product.price! -
-                (product.price! * product.discountPercentage!) / 100
-              ).toFixed(2)}
-            </span>
-          </div>
-        </div>
-
-        <div>
-          <p className="text-sm text-gray-500 mb-1">Offer expires in:</p>
-          <div className="flex gap-3 text-center">
-            <div className="p-2 bg-gray-100 rounded">
-              <p className="text-lg font-bold">02</p>
-              <p className="text-xs">Days</p>
-            </div>
-            <div className="p-2 bg-gray-100 rounded">
-              <p className="text-lg font-bold">12</p>
-              <p className="text-xs">Hours</p>
-            </div>
-            <div className="p-2 bg-gray-100 rounded">
-              <p className="text-lg font-bold">05</p>
-              <p className="text-xs">Minutes</p>
-            </div>
-            <div className="p-2 bg-gray-100 rounded">
-              <p className="text-lg font-bold">45</p>
-              <p className="text-xs">Seconds</p>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <p className="text-sm text-gray-500">Measurements</p>
-          <p className="font-medium">17 1/2 × 20 5/8 "</p>
+          <span className="line-through text-gray-400">${product.price}</span>
+          <span className="text-2xl font-bold text-gray-900">
+            $
+            {(
+              product.price! -
+              (product.price! * product.discountPercentage!) / 100
+            ).toFixed(2)}
+          </span>
         </div>
 
         <div>
           <p className="text-sm text-gray-500 mb-1">Choose Color</p>
-          <div className="flex gap-3  ">
-            {data1.map((c) => (
+          <div className="flex gap-3">
+            {colorOptions.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setColor(c.id)}
@@ -153,7 +142,9 @@ export default function ProductPage() {
               </button>
             ))}
           </div>
-          <p className="ext-sm text-gray-500 mt-4">in stock: {product.stock}</p>
+          <p className="text-sm text-gray-500 mt-4">
+            In stock: {product.stock}
+          </p>
         </div>
 
         <div className="flex items-center gap-3 mt-4">
@@ -164,9 +155,7 @@ export default function ProductPage() {
               className="px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
               -
             </button>
-
             <span className="px-4">{quantity}</span>
-
             <button
               onClick={() => {
                 if (cartItem) {
@@ -175,10 +164,11 @@ export default function ProductPage() {
                   quantity += 1;
                 }
               }}
-              className="px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
+              className="px-3 py-1 hover:bg-gray-100">
               +
             </button>
           </div>
+
           <button
             onClick={() => dispatch(toggleLiked(product))}
             className="flex items-center gap-2 border px-4 py-2 rounded-lg hover:cursor-pointer">
@@ -198,8 +188,8 @@ export default function ProductPage() {
         </button>
 
         <div className="text-sm text-gray-500 mt-3">
-          <p>SKU: 1117</p>
-          <p>Category: Living Room, Bedroom</p>
+          <p>SKU: {product.sku || "N/A"}</p>
+          <p>Category: {product.category}</p>
         </div>
       </div>
     </div>
