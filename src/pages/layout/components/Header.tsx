@@ -74,7 +74,7 @@ const Header = () => {
           })
         );
 
-        const categories: SearchResult[] = Array.from(
+        const categories: any = Array.from(
           new Set((res.data.products || []).map((p: any) => p.category as string))
         ).map((cat) => ({
           id: cat,
