@@ -4,6 +4,7 @@ import Blog from "./blog";
 import GlobalLoading from "../components/GlobalLoading";
 import Reviews from "./ProductDetail/components/Reviews";
 import Questions from "./ProductDetail/components/Questions";
+import Additional from "./ProductDetail/components/Additional";
 
 const MainLayout = lazy(() => import("./layout"));
 
@@ -36,9 +37,9 @@ const AppRouter = () => {
             { path: "contact", element: <ContactUs /> },
             { path: "login", element: <Login /> },
             { path: "product/:id", element: <ProductDetail /> ,children:[
-              {index:true,element: <ProductDetail/> },
-              {path:"reviews",element: <Reviews/> },
+              {index:true,element: <Additional/> },
               {path:"questions",element: <Questions/> },
+              {path:"reviews",element: <Reviews/> },
             ]},
             { path: "blog", element: <Blog /> },
           ],
