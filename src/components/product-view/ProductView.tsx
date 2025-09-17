@@ -3,11 +3,12 @@ import type { IProduct } from "../../types";
 import RightArrow from "../RightArrow";
 import Star from "../Star";
 import UnderlineLink from "../Underline";
-import { FaRegHeart } from "react-icons/fa6";
-import { useDispatch } from "react-redux";
+import { FaHeart, FaRegHeart } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../lib/features/cartSlice";
-import { toggleLiked } from "../../lib/features/likeSlice";
+import {  toggleLiked } from "../../lib/features/likeSlice";
 import { useNavigate } from "react-router-dom";
+import type { RootState } from "../../lib";
 
 interface IProps {
   data: IProduct[];
@@ -26,7 +27,7 @@ const ProductView: FC<IProps> = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const liked = useSelector((state: RootState) => state.liked.value);
   return (
     <section>
       <div className="container">
@@ -85,10 +86,14 @@ const ProductView: FC<IProps> = ({
 
                   <button
                     onClick={() => dispatch(toggleLiked(item))}
-                    className="absolute top-2 right-2 bg-white p-2 rounded-full shadow text-gray-600 
+                    className="absolute top-2 right-2 bg-white p-2 rounded-full shadow text-red-600 
                       opacity-100 sm:opacity-0 group-hover:opacity-100 
                       transition-opacity duration-300">
-                    <FaRegHeart size={14} />
+                    {liked.some((pro) => pro.id === item.id) ? (
+                      <FaHeart className="text-red-500" />
+                    ) : (
+                      <FaRegHeart />
+                    )}
                   </button>
                 </div>
 
