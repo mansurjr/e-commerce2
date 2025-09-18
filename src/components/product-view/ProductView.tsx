@@ -6,7 +6,7 @@ import UnderlineLink from "../Underline";
 import { FaHeart, FaRegHeart } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../lib/features/cartSlice";
-import {  toggleLiked } from "../../lib/features/likeSlice";
+import { toggleLiked } from "../../lib/features/likeSlice";
 import { useNavigate } from "react-router-dom";
 import type { RootState } from "../../lib";
 
@@ -16,6 +16,7 @@ interface IProps {
   error: string | null;
   skeleton?: ReactNode;
   gridType?: "2" | "3" | "4";
+  className?: string;
 }
 
 const ProductView: FC<IProps> = ({
@@ -24,6 +25,7 @@ const ProductView: FC<IProps> = ({
   error,
   skeleton,
   gridType = "4",
+  className,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ const ProductView: FC<IProps> = ({
 
   return (
     <section>
-      <div className="container">
+      <div className={`${className ?? "container"}`}>
         <div className="flex justify-between items-end mb-8">
           <h3 className="font-bold text-3xl">New Arrivals</h3>
           <UnderlineLink>
@@ -51,7 +53,8 @@ const ProductView: FC<IProps> = ({
             className={`grid gap-6 grid-cols-1 sm:grid-cols-2 
             ${gridType === "2" ? "lg:grid-cols-2" : ""} 
             ${gridType === "3" ? "lg:grid-cols-3" : ""} 
-            ${gridType === "4" ? "lg:grid-cols-4" : ""}`}>
+            ${gridType === "4" ? "lg:grid-cols-4" : ""}`}
+          >
             {data.map((item) => (
               <div key={item.id} className="flex flex-col gap-2">
                 <div className="relative w-full bg-[#F3F5F7] group overflow-hidden py-15 hover:cursor-pointer">
@@ -63,8 +66,7 @@ const ProductView: FC<IProps> = ({
                     alt={item.title}
                     className="w-full h-full object-contain"
                   />
-
-                  {cart.some((pro) => pro.id === item.id) ? (
+                 {cart.some((pro) => pro.id === item.id) ? (
                     <button
                       disabled
                       className="absolute bottom-4 left-1/2 -translate-x-1/2
@@ -87,7 +89,6 @@ const ProductView: FC<IProps> = ({
                       Add to cart
                     </button>
                   )}
-
                   <div className="absolute top-4 left-4 flex flex-col items-center gap-2">
                     <span className="bg-white font-semibold px-5 py-1">
                       NEW
@@ -103,7 +104,8 @@ const ProductView: FC<IProps> = ({
                     onClick={() => dispatch(toggleLiked(item))}
                     className="absolute top-2 right-2 bg-white p-2 rounded-full shadow text-red-600 
                       opacity-100 sm:opacity-0 group-hover:opacity-100 
-                      transition-opacity duration-300">
+                      transition-opacity duration-300"
+                  >
                     {liked.some((pro) => pro.id === item.id) ? (
                       <FaHeart className="text-red-500" />
                     ) : (

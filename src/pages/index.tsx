@@ -18,6 +18,13 @@ const SignIn = lazy(() => import("./sign-in"));
 const Account = lazy(() => import("./account"));
 const Auth = lazy(() => import("./auth"));
 
+const AccDetail = lazy(()=> import("./account/component/accDetail"))
+const AccLiked = lazy(() => import("./account/component/accLiked"));
+const AccCart = lazy(() => import("./account/component/accCart"));
+
+
+
+
 const AppRouter = () => {
   return (
     <Suspense fallback={<GlobalLoading />}>
@@ -51,9 +58,9 @@ const AppRouter = () => {
                   path: "account",
                   element: <Account />,
                   children: [
-                    { index: true, element: <Account /> },
-                    { path: "cart", element: <Cart /> },
-                    { path: "liked", element: <Liked /> },
+                    { index: true, element: <AccDetail /> },
+                    { path: "cart", element: <AccCart /> },
+                    { path: "liked", element: <AccLiked /> },
                   ],
                 },
               ],
