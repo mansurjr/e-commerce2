@@ -52,12 +52,10 @@ const Header = () => {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  // disable scroll on mobile menu
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
   }, [isMobileMenuOpen]);
 
-  // handle search debounce
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -102,21 +100,17 @@ const Header = () => {
     return () => clearTimeout(delayDebounce);
   }, [query]);
 
-  // Close search when clicking outside
   useEffect(() => {
     if (!isSearchOpen) return;
-
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setIsSearchOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isSearchOpen]);
 
-  // Focus input when search opens
   useEffect(() => {
     if (isSearchOpen && inputRef.current) {
       inputRef.current.focus();
@@ -129,7 +123,7 @@ const Header = () => {
     setResults([]);
 
     if (item.type === "category") {
-      navigate(`/category/${item.id}`);
+      navigate(`/shop?category=${item.id}`);
     } else if (item.type === "product") {
       navigate(`/product/${item.id}`);
     }
@@ -193,9 +187,7 @@ const Header = () => {
 
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => {
-                  navigate("/liked");
-                }}
+                onClick={() => navigate("/liked")}
                 className="relative flex h-9 w-9 items-center justify-center rounded-md hover:bg-gray-100 transition-colors duration-200">
                 <FaRegHeart className="h-5 w-5" />
                 {liked.length > 0 && (
@@ -217,9 +209,7 @@ const Header = () => {
               </button>
 
               <button
-                onClick={() => {
-                  navigate("/cart");
-                }}
+                onClick={() => navigate("/cart")}
                 className="relative flex h-9 w-9 items-center justify-center rounded-md hover:bg-gray-100 transition-colors duration-200">
                 <ShoppingBag className="h-5 w-5" />
                 {carts.length > 0 && (
@@ -232,7 +222,6 @@ const Header = () => {
           </div>
         </div>
 
-        {/* SEARCH DROPDOWN */}
         {isSearchOpen && (
           <div
             ref={searchRef}
@@ -283,7 +272,6 @@ const Header = () => {
           </div>
         )}
 
-        {/* MOBILE MENU */}
         {isMobileMenuOpen && (
           <div className="fixed inset-0 bg-black/50 z-50 md:hidden">
             <div className="absolute inset-0" onClick={closeMobileMenu} />

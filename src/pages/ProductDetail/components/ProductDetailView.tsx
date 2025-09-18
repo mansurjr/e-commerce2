@@ -28,7 +28,7 @@ export default function ProductPage() {
 
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
-  const path = location.pathname.split("/").pop(); // last segment
+  const path = location.pathname.split("/").pop(); 
 
   const [product, setProduct] = useState<ILikeProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,7 +115,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
         <div className="space-y-4">
           <h2 className="text-3xl font-semibold">{product.title}</h2>
           <p className="text-gray-600">{product.description}</p>
@@ -198,7 +197,6 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* Tabs under product view */}
       <div className="mt-10">
         <div className="flex gap-[80px] text-[20px] pb-[5px] cursor-pointer">
           <NavLink
