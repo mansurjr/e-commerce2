@@ -62,10 +62,11 @@ export default function ProductPage() {
   if (!product) return null;
 
   const cartItem = carts.find((c: ICartProduct) => c.id === product.id);
-  let quantity = cartItem?.quantity ?? 0;
+  const quantity = cartItem?.quantity ?? 0;
 
   return (
     <div className="max-w-6xl mx-auto p-6 grid md:grid-cols-2 gap-10">
+      {/* LEFT SIDE */}
       <div>
         <div className="relative">
           <div className="flex gap-2">
@@ -149,26 +150,22 @@ export default function ProductPage() {
         </div>
 
         <div className="flex items-center gap-3 mt-4">
-          <div className="flex items-center border rounded-md w-fit">
-            <button
-              disabled={quantity <= 1}
-              onClick={() => cartItem && dispatch(decreaseAmount(cartItem))}
-              className="px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
-              -
-            </button>
-            <span className="px-4">{quantity}</span>
-            <button
-              onClick={() => {
-                if (cartItem) {
-                  dispatch(increaseAmount(cartItem));
-                } else {
-                  quantity += 1;
-                }
-              }}
-              className="px-3 py-1 hover:bg-gray-100">
-              +
-            </button>
-          </div>
+          {cartItem && (
+            <div className="flex items-center border rounded-md w-fit">
+              <button
+                disabled={quantity <= 1}
+                onClick={() => cartItem && dispatch(decreaseAmount(cartItem))}
+                className="px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
+                -
+              </button>
+              <span className="px-4">{quantity}</span>
+              <button
+                onClick={() => cartItem && dispatch(increaseAmount(cartItem))}
+                className="px-3 py-1 hover:bg-gray-100">
+                +
+              </button>
+            </div>
+          )}
 
           <button
             onClick={() => dispatch(toggleLiked(product))}
@@ -182,11 +179,13 @@ export default function ProductPage() {
           </button>
         </div>
 
-        <button
-          onClick={() => dispatch(addToCart(product))}
-          className="w-full bg-black text-white py-3 rounded-lg font-medium mt-4 hover:cursor-pointer">
-          Add to Cart
-        </button>
+        {!cartItem && (
+          <button
+            onClick={() => dispatch(addToCart(product))}
+            className="w-full bg-black text-white py-3 rounded-lg font-medium mt-4 hover:cursor-pointer">
+            Add to Cart
+          </button>
+        )}
 
         <div className="text-sm text-gray-500 mt-3">
           <p>SKU: {product.sku || "N/A"}</p>

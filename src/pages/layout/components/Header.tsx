@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -41,6 +41,9 @@ const Header = () => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
       ? "text-[#141718] font-semibold"
@@ -49,10 +52,12 @@ const Header = () => {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  // disable scroll on mobile menu
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
   }, [isMobileMenuOpen]);
 
+  // handle search debounce
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -96,6 +101,27 @@ const Header = () => {
 
     return () => clearTimeout(delayDebounce);
   }, [query]);
+
+  // Close search when clicking outside
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isSearchOpen]);
+
+  // Focus input when search opens
+  useEffect(() => {
+    if (isSearchOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isSearchOpen]);
 
   const handleResultClick = (item: SearchResult) => {
     setIsSearchOpen(false);
@@ -202,10 +228,14 @@ const Header = () => {
           </div>
         </div>
 
+        {/* SEARCH DROPDOWN */}
         {isSearchOpen && (
-          <div className="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-md z-40">
+          <div
+            ref={searchRef}
+            className="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-md z-40">
             <div className="container py-4">
               <input
+                ref={inputRef}
                 type="text"
                 placeholder="Search products or categories..."
                 value={query}
@@ -249,6 +279,7 @@ const Header = () => {
           </div>
         )}
 
+        {/* MOBILE MENU */}
         {isMobileMenuOpen && (
           <div className="fixed inset-0 bg-black/50 z-50 md:hidden">
             <div className="absolute inset-0" onClick={closeMobileMenu} />
