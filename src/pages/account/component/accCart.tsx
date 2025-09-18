@@ -1,18 +1,25 @@
-
 import { memo, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearCart, decreaseAmount, increaseAmount, removeFromCart, type ICartProduct } from "../../../lib/features/cartSlice";
+import {
+  clearCart,
+  decreaseAmount,
+  increaseAmount,
+  removeFromCart,
+  type ICartProduct,
+} from "../../../lib/features/cartSlice";
 import type { RootState } from "../../../lib";
+import { BOT_TOKEN, chatId } from "../../../static";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 type CartsProps = {
   className?: string;
 };
 
-
-
-const accCart = ({ className }: CartsProps) => {
+const AccCart = ({ className }: CartsProps) => {
   const carts = useSelector((state: RootState) => state.cart.value);
   const dispatch = useDispatch();
+
 
   const total = useMemo(() => {
     return carts.reduce(
@@ -20,14 +27,45 @@ const accCart = ({ className }: CartsProps) => {
       0
     );
   }, [carts]);
+
+  // 🚀 Checkout Handler with Telegram Bot API
+  const handleCheckout = async () => {
+    try {
+      const cartText = carts
+        .map(
+          (item, idx) =>
+            `${idx + 1}. ${item.title} (x${item.quantity}) - $${(
+              item.price! * item.quantity
+            ).toFixed(2)}`
+        )
+        .join("\n");
+
+      const message = `🛒 *New Checkout Order*\n\n${cartText}\n\n💰 *Total:* $${total.toFixed(
+        2
+      )}`;
+
+      await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        chat_id: chatId,
+        text: message,
+        parse_mode: "Markdown",
+      });
+
+      dispatch(clearCart());
+      toast.success("Order placed successfully!");
+    } catch (err) {
+      toast.error("Something went wrong!");
+    }
+  };
+
   return (
-    <div className={` mx-auto  ${className}`}>
+    <div className={`mx-auto ${className}`}>
       <h3 className="text-2xl sm:text-3xl lg:text-[40px] font-medium text-center my-6 sm:my-12">
         Cart
       </h3>
 
       {carts.length ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Left: Products */}
           <div className="lg:col-span-2 overflow-x-auto">
             <table className="w-full border-t border-gray-200 text-sm sm:text-base">
               <thead>
@@ -56,33 +94,28 @@ const accCart = ({ className }: CartsProps) => {
                         </p>
                         <button
                           className="mt-1 text-xs sm:text-sm text-[#6C7275] hover:underline"
-                          onClick={() => dispatch(removeFromCart(item))}
-                        >
+                          onClick={() => dispatch(removeFromCart(item))}>
                           ✖ Remove
                         </button>
                       </div>
                     </td>
-
                     <td className="px-2 sm:px-4 py-2">
                       <div className="flex items-center border rounded-md w-fit">
                         <button
                           disabled={item.quantity <= 1}
                           onClick={() => dispatch(decreaseAmount(item))}
-                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100"
-                        >
+                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
                           -
                         </button>
                         <span className="px-3 sm:px-4">{item.quantity}</span>
                         <button
                           disabled={item.quantity >= item.stock!}
                           onClick={() => dispatch(increaseAmount(item))}
-                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100"
-                        >
+                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
                           +
                         </button>
                       </div>
                     </td>
-
                     <td className="px-2 sm:px-4 text-gray-700 font-medium">
                       ${item.price!.toFixed(2)}
                     </td>
@@ -95,6 +128,7 @@ const accCart = ({ className }: CartsProps) => {
             </table>
           </div>
 
+          {/* Right: Summary */}
           <div className="bg-white shadow rounded-xl p-4 sm:p-6 h-fit border">
             <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">
               Cart summary
@@ -115,9 +149,8 @@ const accCart = ({ className }: CartsProps) => {
             </div>
 
             <button
-              onClick={() => dispatch(clearCart())}
-              className="mt-6 w-full bg-black hover:bg-gray-800 text-white py-2 sm:py-3 rounded-lg transition"
-            >
+              onClick={handleCheckout}
+              className="mt-6 w-full bg-black hover:bg-gray-800 text-white py-2 sm:py-3 rounded-lg transition">
               Checkout
             </button>
           </div>
@@ -139,4 +172,4 @@ const accCart = ({ className }: CartsProps) => {
   );
 };
 
-export default memo(accCart)
+export default memo(AccCart);

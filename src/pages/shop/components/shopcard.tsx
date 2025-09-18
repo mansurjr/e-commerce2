@@ -8,26 +8,27 @@ import {
 import { useFetch } from "../../../hooks/useFetch";
 import ProductView from "../../../components/product-view/ProductView";
 import type { IProduct } from "../../../types";
-
-import uchta from "../../../assets/shop/3ta.svg";
-import ikkita from "../../../assets/shop/2ta.svg";
-import { FaTableCellsLarge } from "react-icons/fa6";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FiGrid, FiSquare, FiColumns } from "react-icons/fi"; // Icons for grid view
 
 const ShopCard = () => {
   const [order, setOrder] = useState<string>("id-asc");
   const [skip, setSkip] = useState(0);
   const [products, setProducts] = useState<IProduct[]>([]);
-  const [category, setCategory] = useState("");
   const [gridType, setGridType] = useState<"2" | "3" | "4">("4");
 
-  const limit = 4;
+  const limit = 8;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const categoryParam = searchParams.get("category") || "";
 
   const { data: categories } = useFetch<string[]>("/products/category-list");
 
   const { data, loading, error } = useFetch<{
     products: IProduct[];
     total: number;
-  }>(`/products/${category}`, {
+  }>(`/products/${categoryParam ? `category/${categoryParam}` : ""}`, {
     limit,
     skip,
     sortBy: order.split("-")[0],
@@ -35,10 +36,13 @@ const ShopCard = () => {
   });
 
   useEffect(() => {
+    window.scrollTo(50, 50);
     if (data?.products) {
-      setProducts((prev) => [...prev, ...data.products]);
+      setProducts((prev) =>
+        skip === 0 ? data.products : [...prev, ...data.products]
+      );
     }
-  }, [data]);
+  }, [data, skip]);
 
   const setDefaultValue = useCallback(() => {
     setProducts([]);
@@ -52,17 +56,18 @@ const ShopCard = () => {
 
   const handleChangeCategory = (e: ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    setCategory(value ? `category/${value}` : value);
+    navigate(value ? `?category=${value}` : "");
     setDefaultValue();
   };
 
   return (
-    <div className="">
-      {/* <h2>Shop</h2> */}
-
-      <div className="container flex justify-between">
-        <div className="">
-          <select className="border rounded-full" onChange={handleChangeOrder}>
+    <div>
+      <div className="container flex justify-between items-center mb-6">
+        <div className="flex gap-4">
+          <select
+            className="border rounded-full px-3 py-1"
+            value={order}
+            onChange={handleChangeOrder}>
             <option value="id-asc">OmmaBop</option>
             <option value="rating-desc">Reyting</option>
             <option value="price-desc">Qimmat</option>
@@ -71,8 +76,8 @@ const ShopCard = () => {
 
           <select
             onChange={handleChangeCategory}
-            className="border rounded-full"
-          >
+            value={categoryParam}
+            className="border rounded-full px-3 py-1">
             <option value="">All</option>
             {categories?.map((item) => (
               <option key={item} value={item}>
@@ -81,15 +86,29 @@ const ShopCard = () => {
             ))}
           </select>
         </div>
-        <div>
-          <button onClick={() => setGridType("4")}>
-            <FaTableCellsLarge size={40} />
+
+        {/* Grid type buttons with icons */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setGridType("4")}
+            className={`p-2 rounded ${
+              gridType === "4" ? "bg-black text-white" : "bg-gray-200"
+            }`}>
+            <FiGrid size={18} />
           </button>
-          <button onClick={() => setGridType("3")}>
-            <img src={uchta} alt="" />
+          <button
+            onClick={() => setGridType("3")}
+            className={`p-2 rounded ${
+              gridType === "3" ? "bg-black text-white" : "bg-gray-200"
+            }`}>
+            <FiColumns size={18} />
           </button>
-          <button onClick={() => setGridType("2")}>
-            <img src={ikkita} alt="" />
+          <button
+            onClick={() => setGridType("2")}
+            className={`p-2 rounded ${
+              gridType === "2" ? "bg-black text-white" : "bg-gray-200"
+            }`}>
+            <FiSquare size={18} />
           </button>
         </div>
       </div>
@@ -107,8 +126,7 @@ const ShopCard = () => {
         <div className="flex justify-center py-6">
           <button
             className="border rounded-full w-28"
-            onClick={() => setSkip((p) => p + limit)}
-          >
+            onClick={() => setSkip((p) => p + limit)}>
             See more
           </button>
         </div>

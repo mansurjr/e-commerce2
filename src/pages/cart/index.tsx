@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import { BOT_TOKEN, chatId as CHAT_ID } from "../../static";
 import toast from "react-hot-toast";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type CartsProps = {
   className?: string;
@@ -20,6 +20,7 @@ type CartsProps = {
 const Cart = ({ className }: CartsProps) => {
   const carts = useSelector((state: RootState) => state.cart.value);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const total = useMemo(() => {
     return carts.reduce(
@@ -53,7 +54,7 @@ const Cart = ({ className }: CartsProps) => {
 
       dispatch(clearCart());
       toast.success("Order placed successfully!");
-      <Navigate replace to={"/"} />;
+      navigate("/shop", { replace: true });
     } catch (err) {
       toast.error("Something went wrong!");
     }
