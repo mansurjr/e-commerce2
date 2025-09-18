@@ -30,6 +30,8 @@ const ProductView: FC<IProps> = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const liked = useSelector((state: RootState) => state.liked.value);
+  const cart = useSelector((state: RootState) => state.cart.value);
+
   return (
     <section>
       <div className={`${className ?? "container"}`}>
@@ -64,19 +66,29 @@ const ProductView: FC<IProps> = ({
                     alt={item.title}
                     className="w-full h-full object-contain"
                   />
-
-                  <button
-                    onClick={() => dispatch(addToCart(item))}
-                    className="absolute bottom-4 left-1/2 -translate-x-1/2
-                      w-[80%] max-w-[230px] py-3 
-                      bg-[#141718] text-white rounded-xl
-                      opacity-100 sm:opacity-0 group-hover:opacity-100 
-                      translate-y-0 sm:translate-y-4 group-hover:translate-y-0
-                      transition-all duration-300 hover:cursor-pointer"
-                  >
-                    Add to cart
-                  </button>
-
+                 {cart.some((pro) => pro.id === item.id) ? (
+                    <button
+                      disabled
+                      className="absolute bottom-4 left-1/2 -translate-x-1/2
+      w-[80%] max-w-[230px] py-3 
+      bg-gray-400 text-white rounded-xl
+      opacity-100 sm:opacity-0 group-hover:opacity-100 
+      translate-y-0 sm:translate-y-4 group-hover:translate-y-0
+      transition-all duration-300 cursor-not-allowed">
+                      Already in cart
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => dispatch(addToCart(item))}
+                      className="absolute bottom-4 left-1/2 -translate-x-1/2
+      w-[80%] max-w-[230px] py-3 
+      bg-[#141718] text-white rounded-xl
+      opacity-100 sm:opacity-0 group-hover:opacity-100 
+      translate-y-0 sm:translate-y-4 group-hover:translate-y-0
+      transition-all duration-300 hover:cursor-pointer">
+                      Add to cart
+                    </button>
+                  )}
                   <div className="absolute top-4 left-4 flex flex-col items-center gap-2">
                     <span className="bg-white font-semibold px-5 py-1">
                       NEW
