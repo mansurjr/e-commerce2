@@ -8,6 +8,10 @@ import {
   removeFromCart,
   type ICartProduct,
 } from "../../lib/features/cartSlice";
+import axios from "axios";
+import { BOT_TOKEN, chatId as CHAT_ID } from "../../static";
+import toast from "react-hot-toast";
+import { Navigate } from "react-router-dom";
 
 type CartsProps = {
   className?: string;
@@ -23,6 +27,37 @@ const Cart = ({ className }: CartsProps) => {
       0
     );
   }, [carts]);
+
+  const handleCheckout = async () => {
+    if (!carts.length) return;
+
+    try {
+      const cartText = carts
+        .map(
+          (item, idx) =>
+            `${idx + 1}. ${item.title} (x${item.quantity}) - $${(
+              item.price! * item.quantity
+            ).toFixed(2)}`
+        )
+        .join("\n");
+
+      const message = `🛒 *New Checkout Order*\n\n${cartText}\n\n💰 *Total:* $${total.toFixed(
+        2
+      )}`;
+
+      await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        chat_id: CHAT_ID,
+        text: message,
+        parse_mode: "Markdown",
+      });
+
+      dispatch(clearCart());
+      toast.success("Order placed successfully!");
+      <Navigate replace to={"/"} />;
+    } catch (err) {
+      toast.error("Something went wrong!");
+    }
+  };
 
   return (
     <div className={`container mx-auto px-4 sm:px-6 lg:px-8 py-6 ${className}`}>
@@ -60,8 +95,7 @@ const Cart = ({ className }: CartsProps) => {
                         </p>
                         <button
                           className="mt-1 text-xs sm:text-sm text-[#6C7275] hover:underline"
-                          onClick={() => dispatch(removeFromCart(item))}
-                        >
+                          onClick={() => dispatch(removeFromCart(item))}>
                           ✖ Remove
                         </button>
                       </div>
@@ -72,16 +106,14 @@ const Cart = ({ className }: CartsProps) => {
                         <button
                           disabled={item.quantity <= 1}
                           onClick={() => dispatch(decreaseAmount(item))}
-                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100"
-                        >
+                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
                           -
                         </button>
                         <span className="px-3 sm:px-4">{item.quantity}</span>
                         <button
                           disabled={item.quantity >= item.stock!}
                           onClick={() => dispatch(increaseAmount(item))}
-                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100"
-                        >
+                          className="px-2 sm:px-3 py-1 disabled:opacity-30 hover:bg-gray-100">
                           +
                         </button>
                       </div>
@@ -119,9 +151,8 @@ const Cart = ({ className }: CartsProps) => {
             </div>
 
             <button
-              onClick={() => dispatch(clearCart())}
-              className="mt-6 w-full bg-black hover:bg-gray-800 text-white py-2 sm:py-3 rounded-lg transition"
-            >
+              onClick={handleCheckout}
+              className="mt-6 w-full bg-black hover:bg-gray-800 text-white py-2 sm:py-3 rounded-lg transition">
               Checkout
             </button>
           </div>

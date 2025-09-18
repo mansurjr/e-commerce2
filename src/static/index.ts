@@ -1,15 +1,15 @@
 import article1 from "../assets/article1.png";
 import article2 from "../assets/article2.png";
 import article3 from "../assets/article3.png";
-import image1 from "../assets/blog/imgcontainer1.png"
-import image2 from "../assets/blog/imgcontainer2.png"
-import image3 from "../assets/blog/imgcontainer3.png"
-import image4 from "../assets/blog/imgcontainer4.png"
-import image5 from "../assets/blog/imgcontainer5.png"
-import image6 from "../assets/blog/imgcontainer6.png"
-import image7 from "../assets/blog/imgcontainer7.png"
-import image8 from "../assets/blog/imgcontainer8.png"
-import image9 from "../assets/blog/imgcontainer9.png"
+import image1 from "../assets/blog/imgcontainer1.png";
+import image2 from "../assets/blog/imgcontainer2.png";
+import image3 from "../assets/blog/imgcontainer3.png";
+import image4 from "../assets/blog/imgcontainer4.png";
+import image5 from "../assets/blog/imgcontainer5.png";
+import image6 from "../assets/blog/imgcontainer6.png";
+import image7 from "../assets/blog/imgcontainer7.png";
+import image8 from "../assets/blog/imgcontainer8.png";
+import image9 from "../assets/blog/imgcontainer9.png";
 export const articles = [
   {
     id: 1,
@@ -30,7 +30,6 @@ export const articles = [
     link: "/articles/3",
   },
 ];
-
 
 export const Blogarticles = [
   {
@@ -97,3 +96,6 @@ export const Blogarticles = [
     link: "/articles/9",
   },
 ];
+
+export const BOT_TOKEN = "8382177240:AAGPccV95MoQwA0sltN75hitlLBV7lfwDAA";
+export const chatId = "5401845970";

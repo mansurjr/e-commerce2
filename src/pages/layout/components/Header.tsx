@@ -198,9 +198,11 @@ const Header = () => {
                 }}
                 className="relative flex h-9 w-9 items-center justify-center rounded-md hover:bg-gray-100 transition-colors duration-200">
                 <FaRegHeart className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-medium">
-                  {liked.length}
-                </span>
+                {liked.length > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-medium">
+                    {liked.length}
+                  </span>
+                )}
               </button>
               <button
                 className="hidden md:flex h-9 w-9 items-center justify-center rounded-md hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
@@ -220,9 +222,11 @@ const Header = () => {
                 }}
                 className="relative flex h-9 w-9 items-center justify-center rounded-md hover:bg-gray-100 transition-colors duration-200">
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-medium">
-                  {carts.length}
-                </span>
+                {carts.length > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-medium">
+                    {carts.length}
+                  </span>
+                )}
               </button>
             </div>
           </div>
