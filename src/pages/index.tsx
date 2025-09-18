@@ -2,6 +2,9 @@ import { lazy, memo, Suspense } from "react";
 import { useRoutes } from "react-router-dom";
 import Blog from "./blog";
 import GlobalLoading from "../components/GlobalLoading";
+import Review from "./ProductDetail/components/Review";
+import Questions from "./ProductDetail/components/Questions";
+import Addidtional from "./ProductDetail/components/Addidtional";
 
 const MainLayout = lazy(() => import("./layout"));
 
@@ -33,7 +36,15 @@ const AppRouter = () => {
             { path: "liked", element: <Liked /> },
             { path: "contact", element: <ContactUs /> },
             { path: "login", element: <Login /> },
-            { path: "product/:id", element: <ProductDetail /> },
+            {
+              path: "product/:id",
+              element: <ProductDetail />,
+              children: [
+                { index: true, element: <Review /> },
+                { path: "questions", element: <Questions /> },
+                { path: "additionals", element: <Addidtional /> },
+              ],
+            },
             { path: "blog", element: <Blog /> },
           ],
         },
